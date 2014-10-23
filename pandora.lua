@@ -1,4 +1,5 @@
 scriptId = 'ninja.chainsaw.pandora'
+version = '0.1.5'
 
 -- Mappings
 -- Fingers Spread - (spacebar) Toggle Play / Pause
@@ -12,8 +13,8 @@ scriptId = 'ninja.chainsaw.pandora'
 
 -- Variables
 volumeTick = 0
-volumeTickMax = 20
-debugFlag = 1
+volumeTickMax = 25
+debugFlag = 0
 
 function debugMsg(consoleMsg)
 	if debugFlag == 1 then
@@ -37,18 +38,18 @@ function volumeUp()
 		volumeTick = volumeTick - 1
 	end
 	debugMsg("up")
-	debugMsg("volumeTick is" .. volumeTick)
+	debugMsg("volumeTick is " .. volumeTick)
 	extendUnlock()
 end
 
 function volumeDown()
 	if volumeTick < 1 then
 		myo.keyboard("down_arrow", "press")
-		volumeTick = 10
+		volumeTick = volumeTickMax
 	else 
 		volumeTick = volumeTick - 1
 	end
-	debugMsg("volumeTick is" .. volumeTick)
+	debugMsg("volumeTick is " .. volumeTick)
 	debugMsg("down")
 	extendUnlock()
 end
@@ -107,19 +108,11 @@ function onPoseEdge(pose, edge)
             skipSong()
         end
         if pose == "waveIn" and edge == "on" then
-            if currentYaw > 1.5 then
-               -- myo.debug('great than 1.5 '..currentYaw)
-            else
-                --myo.debug('less than 1.5 '..currentYaw)
-            end
-            --myo.vibrate("short")
             enabled = false
-            --archiveConversation()
         end
         if pose == "fist" and edge == "on" then
-			
-			debugMsg("Pitch... "..currentPitch)
-			debugMsg("Yaw... "..currentYaw)
+			--debugMsg("Pitch... "..currentPitch)
+			--debugMsg("Yaw... "..currentYaw)
 			debugMsg("Roll... "..currentRoll)
             myo.vibrate("short")
             startRoll = currentRoll
@@ -142,16 +135,9 @@ function onPoseEdge(pose, edge)
 			volumeDirection = ""
 		end
         if pose == "fingersSpread" then
-           -- myo.debug("hey.. "..currentYaw)
-            if edge == "off" and currentPitch < 0.1 then
-                myo.vibrate("medium")
-                enabled = true
-                pausePlay()
-            elseif edge == "off" and currentPitch > 0.2 then
-                myo.vibrate("short")
-                enabled = true
-                pausePlay()
-            end
+			myo.vibrate("short")
+			enabled = true
+			pausePlay()
         end
     end
 end
@@ -174,19 +160,18 @@ function onPeriodic()
 	
 	local now = myo.getTimeMilliseconds()
     
-   if enabled then
-
-        if myo.getTimeMilliseconds() - enabledSince > ENABLED_TIMEOUT then
+	if enabled then
+		if myo.getTimeMilliseconds() - enabledSince > ENABLED_TIMEOUT then
             enabled = false
         end
 		
 		if enabled == true and (volumeDirection == "up" or volumeDirection == "down") then
 			--Double Check direction
 			if currentRoll > startRoll then
-				volumeDirection = "down"
+				volumeDirection = "up"
 				volumeUp()
 			else
-				volumeDirection = "up"
+				volumeDirection = "down"
 				volumeDown()
 			end
 		end
