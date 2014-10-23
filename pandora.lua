@@ -1,5 +1,5 @@
 scriptId = 'ninja.chainsaw.pandora'
-version = '0.1.5'
+version = '0.1.6'
 
 -- Mappings
 -- Fingers Spread - (spacebar) Toggle Play / Pause
@@ -134,7 +134,7 @@ function onPoseEdge(pose, edge)
 		if pose == "fist" and edge == "off" then
 			volumeDirection = ""
 		end
-        if pose == "fingersSpread" then
+        if pose == "fingersSpread" and edge == "on" then
 			myo.vibrate("short")
 			enabled = true
 			pausePlay()
